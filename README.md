@@ -5,13 +5,13 @@
 <br />
 <sub>The bones speak while we wait for the flesh.</sub>
 
-[![Checks](https://github.com/Wildhoney/Skeleton/actions/workflows/checks.yml/badge.svg)](https://github.com/Wildhoney/Skeleton/actions/workflows/checks.yml)
+[![Checks](https://github.com/Wildhoney/Bonework/actions/workflows/checks.yml/badge.svg)](https://github.com/Wildhoney/Bonework/actions/workflows/checks.yml)
 
 </div>
 
 > CSS Anchor Positioning skeleton loader for React. Children stay mounted &mdash; shimmer overlays paint exactly over their bounding boxes, no measure-and-redraw.
 
-> **[View Live Demo →](https://wildhoney.github.io/Skeleton/)**
+> **[View Live Demo →](https://wildhoney.github.io/Bonework/)**
 
 ## Contents
 

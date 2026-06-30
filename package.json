@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",
-    "build:example": "vite build --mode example --base /Skeleton/ && mv dist-example/src/example/index.html dist-example/index.html && rm -rf dist-example/src",
+    "build:example": "vite build --mode example --base /Bonework/ && mv dist-example/src/example/index.html dist-example/index.html && rm -rf dist-example/src",
     "dev": "vite",
     "preview": "vite preview",
     "test": "vitest run",
@@ -47,7 +47,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Wildhoney/Skeleton.git"
+    "url": "git+https://github.com/Wildhoney/Bonework.git"
   },
   "peerDependencies": {
     "react": ">=18"
