@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-example
+coverage
+.DS_Store
+*.log
+.vscode
+.idea
+.claude
+playwright-report
+test-results
+.playwright-mcp
