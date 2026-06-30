@@ -136,7 +136,7 @@ Two optional props tweak how the overlay paints:
 
 ## Testing
 
-The component renders the real DOM, just decorated with `aria-hidden` and anchor styles. Assert by querying for the anchored elements (`style.anchorName` starts with `--sk-`) or the overlay siblings (`aria-hidden="true"`). The library's own suite at [`src/skeleton/index.test.tsx`](./src/skeleton/index.test.tsx) is a good template.
+The component renders the real DOM, just decorated with `aria-hidden` and anchor styles. Assert by querying for the anchored elements (`style.anchorName` starts with `--sk-`) or the overlay siblings (`aria-hidden="true"`). The library's own suite at [`src/library/index.test.tsx`](./src/library/index.test.tsx) is a good template.
 
 ```tsx
 import { render } from "@testing-library/react";
