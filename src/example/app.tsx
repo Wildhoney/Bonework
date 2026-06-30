@@ -1,101 +1,119 @@
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Bonework } from "bonework";
 
-const palettes = {
-  purple: { bone: "#edeafd", highlight: "#ddd7fa" },
-  grey: { bone: "#f2f2f2", highlight: "#e1e1e1" },
-} as const;
+import { cattery, type Cat } from "./cattery";
+import * as styles from "./styles";
 
-export function App() {
-  const [resolving, setResolving] = useState(false);
-  const [tone, setTone] = useState<keyof typeof palettes>("purple");
+const client = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: Infinity, refetchOnWindowFocus: false },
+  },
+});
+
+const placeholderCat: Cat = {
+  id: "__placeholder__",
+  name: "A new arrival",
+  breed: "Settling in",
+  avatar: "https://placehold.co/200x200/edeafd/3c1b72?text=%3F",
+  bio: "Just stepped through the cattery door. Give the staff a moment to write up the paperwork.",
+  age: 0,
+};
+
+function Cattery() {
+  const queryClient = useQueryClient();
+  const [cats, setCats] = useState<Cat[]>(cattery.initial);
+
+  const adoption = useMutation({
+    mutationFn: () => cattery.adopt(),
+    onMutate() {
+      setCats((current) => [
+        ...current,
+        { ...placeholderCat, id: `__loading_${Date.now()}__` },
+      ]);
+    },
+    onSuccess(cat) {
+      setCats((current) =>
+        current.map((entry) =>
+          entry.id.startsWith("__loading_") ? cat : entry,
+        ),
+      );
+      void queryClient.invalidateQueries({ queryKey: ["cats"] });
+    },
+  });
+
+  const isAdopting = adoption.isPending;
 
   return (
-    <main
-      style={{
-        fontFamily: "system-ui, sans-serif",
-        maxWidth: 720,
-        margin: "48px auto",
-        padding: "0 24px",
-        color: "#1f1740",
-      }}
-    >
-      <header style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: 0 }}>bonework</h1>
-        <p style={{ color: "#5b5577", marginTop: 8 }}>
-          CSS Anchor Positioning skeleton loader. Children stay mounted —
-          shimmer overlays paint exactly over their bounding boxes.
-        </p>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <div className={styles.brand}>
+          <span className={styles.brandMark}>B</span>
+          <strong>Bonework Cattery</strong>
+        </div>
+        <button
+          type="button"
+          className={styles.button}
+          onClick={() => adoption.mutate()}
+          disabled={isAdopting}
+        >
+          {isAdopting ? "Adoption in progress…" : "Adopt a new cat"}
+        </button>
       </header>
 
-      <section style={{ marginBottom: 24, display: "flex", gap: 24 }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={resolving}
-            onChange={(event) => setResolving(event.target.checked)}
-          />{" "}
-          resolving
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="tone"
-            checked={tone === "purple"}
-            onChange={() => setTone("purple")}
-          />{" "}
-          purple
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="tone"
-            checked={tone === "grey"}
-            onChange={() => setTone("grey")}
-          />{" "}
-          grey
-        </label>
+      <section className={styles.hero}>
+        <h1 className={styles.heroTitle}>The bones of every loading state.</h1>
+        <p className={styles.heroLead}>
+          Click <em>Adopt a new cat</em>. The paperwork takes five seconds —
+          long enough to see Bonework paint a shimmer over the new card while
+          the existing ones stay perfectly still.
+        </p>
       </section>
 
-      <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontSize: 14, textTransform: "uppercase" }}>
-          Single block
-        </h2>
-        <Bonework resolving={resolving} palette={palettes[tone]}>
-          <p>The quick brown fox jumps over the lazy dog.</p>
-        </Bonework>
-      </section>
+      <h2 className={styles.sectionTitle}>Currently in our care</h2>
 
-      <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontSize: 14, textTransform: "uppercase" }}>
-          Nested levels
-        </h2>
-        <Bonework resolving={resolving} palette={palettes[tone]} levels={2}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              padding: 16,
-              border: "1px solid #e7e1f5",
-              borderRadius: 12,
-            }}
-          >
-            <img
-              src="https://placehold.co/64x64"
-              alt=""
-              width={64}
-              height={64}
-              style={{ borderRadius: 32 }}
-            />
-            <div>
-              <strong>Acme Trading LLC</strong>
-              <p style={{ margin: 0, color: "#5b5577" }}>Treasury</p>
-            </div>
-          </div>
-        </Bonework>
-      </section>
+      <div className={styles.grid}>
+        {cats.map((cat) => {
+          const isLoading = cat.id.startsWith("__loading_");
+          return (
+            <Bonework
+              key={cat.id}
+              resolving={!isLoading}
+              palette={styles.palette}
+              levels={3}
+            >
+              <article className={styles.card}>
+                <img
+                  src={cat.avatar}
+                  alt={cat.name}
+                  width={120}
+                  height={120}
+                  className={styles.avatar}
+                />
+                <h3 className={styles.name}>{cat.name}</h3>
+                <p className={styles.meta}>
+                  {cat.breed} · {cat.age} yr
+                </p>
+                <p className={styles.bio}>{cat.bio}</p>
+              </article>
+            </Bonework>
+          );
+        })}
+      </div>
     </main>
+  );
+}
+
+export function App() {
+  return (
+    <QueryClientProvider client={client}>
+      <Cattery />
+    </QueryClientProvider>
   );
 }
