@@ -2,9 +2,9 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQueryClient,
+  useQuery,
 } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 
 import { Bonework } from "bonework";
 
@@ -17,38 +17,50 @@ const client = new QueryClient({
   },
 });
 
-const placeholderCat: Cat = {
+const placeholder: Cat = {
   id: "__placeholder__",
   name: "A new arrival",
   breed: "Settling in",
-  avatar: "https://placehold.co/200x200/edeafd/3c1b72?text=%3F",
+  avatar:
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23edeafd'/></svg>",
   bio: "Just stepped through the cattery door. Give the staff a moment to write up the paperwork.",
   age: 0,
 };
 
-function Cattery() {
-  const queryClient = useQueryClient();
-  const [cats, setCats] = useState<Cat[]>(cattery.initial);
+function Cattery(): ReactElement {
+  const initial = useQuery({
+    queryKey: ["cats", "initial"],
+    queryFn: () => cattery.initial(),
+  });
+
+  const [adopted, setAdopted] = useState<Cat[]>([]);
+  const [pending, setPending] = useState<string[]>([]);
 
   const adoption = useMutation({
     mutationFn: () => cattery.adopt(),
     onMutate() {
-      setCats((current) => [
-        ...current,
-        { ...placeholderCat, id: `__loading_${Date.now()}__` },
-      ]);
+      const pendingId = `__loading_${Date.now()}__`;
+      setPending((current) => [...current, pendingId]);
+      return { pendingId };
     },
-    onSuccess(cat) {
-      setCats((current) =>
-        current.map((entry) =>
-          entry.id.startsWith("__loading_") ? cat : entry,
-        ),
+    onSuccess(cat, _variables, context) {
+      setPending((current) =>
+        current.filter((id) => id !== context?.pendingId),
       );
-      void queryClient.invalidateQueries({ queryKey: ["cats"] });
+      setAdopted((current) => [...current, cat]);
     },
   });
 
-  const isAdopting = adoption.isPending;
+  const isLoadingInitial = !initial.data;
+  const initialCats: Cat[] = initial.data ?? [
+    { ...placeholder, id: "__loading_initial_0__" },
+    { ...placeholder, id: "__loading_initial_1__" },
+  ];
+  const cats: Cat[] = [
+    ...initialCats,
+    ...adopted,
+    ...pending.map((id) => ({ ...placeholder, id })),
+  ];
 
   return (
     <main className={styles.page}>
@@ -61,30 +73,23 @@ function Cattery() {
           type="button"
           className={styles.button}
           onClick={() => adoption.mutate()}
-          disabled={isAdopting}
+          disabled={adoption.isPending}
         >
-          {isAdopting ? "Adoption in progress…" : "Adopt a new cat"}
+          {adoption.isPending ? "Adoption in progress…" : "Adopt a new cat"}
         </button>
       </header>
-
-      <section className={styles.hero}>
-        <h1 className={styles.heroTitle}>The bones of every loading state.</h1>
-        <p className={styles.heroLead}>
-          Click <em>Adopt a new cat</em>. The paperwork takes five seconds —
-          long enough to see Bonework paint a shimmer over the new card while
-          the existing ones stay perfectly still.
-        </p>
-      </section>
 
       <h2 className={styles.sectionTitle}>Currently in our care</h2>
 
       <div className={styles.grid}>
         {cats.map((cat) => {
-          const isLoading = cat.id.startsWith("__loading_");
+          const resolving =
+            !cat.id.startsWith("__loading_") &&
+            !(isLoadingInitial && cat.id.startsWith("__loading_initial_"));
           return (
             <Bonework
               key={cat.id}
-              resolving={!isLoading}
+              resolving={resolving}
               palette={styles.palette}
               levels={3}
             >
@@ -97,9 +102,11 @@ function Cattery() {
                   className={styles.avatar}
                 />
                 <h3 className={styles.name}>{cat.name}</h3>
-                <p className={styles.meta}>
-                  {cat.breed} · {cat.age} yr
-                </p>
+                <div>
+                  <p className={styles.meta}>
+                    {cat.breed} · {cat.age} yr
+                  </p>
+                </div>
                 <p className={styles.bio}>{cat.bio}</p>
               </article>
             </Bonework>
@@ -110,7 +117,7 @@ function Cattery() {
   );
 }
 
-export function App() {
+export function App(): ReactElement {
   return (
     <QueryClientProvider client={client}>
       <Cattery />

@@ -7,35 +7,27 @@ export type Cat = {
   age: number;
 };
 
-const colours = [
-  "edeafd/3c1b72",
-  "f5e1d8/8b4513",
-  "fde2d4/c75b39",
-  "e8f5e9/2e7d32",
-  "fff3cd/8d6e00",
-  "e0f7fa/006978",
-] as const;
+type Profile = Omit<Cat, "id" | "avatar">;
 
-const initial: Cat[] = [
+const profiles: Profile[] = [
   {
-    id: "1",
     name: "Bartholomew",
     breed: "British Shorthair",
-    avatar: `https://placehold.co/200x200/${colours[0]}?text=B`,
     bio: "Distinguished, suspicious of strangers, ferocious in his pursuit of dinner.",
     age: 4,
   },
   {
-    id: "2",
     name: "Saoirse",
     breed: "Russian Blue",
-    avatar: `https://placehold.co/200x200/${colours[1]}?text=S`,
     bio: "Plush coat, plush opinions. Will lecture you on the correct way to open a tin.",
     age: 2,
   },
-];
-
-const candidates: Omit<Cat, "id" | "avatar">[] = [
+  {
+    name: "Marigold",
+    breed: "Maine Coon",
+    bio: "Larger than every dog she's met. Has not noticed.",
+    age: 6,
+  },
   {
     name: "Persephone",
     breed: "Egyptian Mau",
@@ -68,27 +60,42 @@ const candidates: Omit<Cat, "id" | "avatar">[] = [
   },
 ];
 
-let nextId = initial.length + 1;
-let nextColour = 3;
+let nextId = 1;
+let nextProfile = 0;
+
+async function fetchImageUrl(): Promise<string> {
+  const response = await fetch(
+    "https://api.thecatapi.com/v1/images/search?size=med",
+  );
+  if (!response.ok) throw new Error("Failed to fetch a cat photo.");
+  const data = (await response.json()) as Array<{ url: string }>;
+  const url = data[0]?.url;
+  if (!url) throw new Error("Cat API returned an empty payload.");
+  return url;
+}
+
+function pickProfile(): Profile {
+  const profile = profiles[nextProfile % profiles.length]!;
+  nextProfile++;
+  return profile;
+}
 
 export const cattery = {
-  initial,
-  adopt(): Promise<Cat> {
-    return new Promise((resolve) => {
-      window.setTimeout(() => {
-        const pick = candidates[Math.floor(Math.random() * candidates.length)]!;
-        const id = String(nextId++);
-        const colour = colours[nextColour % colours.length]!;
-        nextColour++;
-        resolve({
-          id,
-          name: pick.name,
-          breed: pick.breed,
-          bio: pick.bio,
-          age: pick.age,
-          avatar: `https://placehold.co/200x200/${colour}?text=${pick.name.charAt(0)}`,
-        });
-      }, 5000);
-    });
+  async initial(): Promise<Cat[]> {
+    const [first, second] = await Promise.all([
+      fetchImageUrl(),
+      fetchImageUrl(),
+    ]);
+    return [
+      { ...pickProfile(), id: String(nextId++), avatar: first },
+      { ...pickProfile(), id: String(nextId++), avatar: second },
+    ];
+  },
+  async adopt(): Promise<Cat> {
+    const [image] = await Promise.all([
+      fetchImageUrl(),
+      new Promise((resolve) => window.setTimeout(resolve, 5000)),
+    ]);
+    return { ...pickProfile(), id: String(nextId++), avatar: image };
   },
 };
