@@ -1,32 +1,15 @@
 import { useState } from "react";
 
-import { ColourMode, Skeleton } from "@wildhoney/skeleton";
+import { Bonework } from "bonework";
 
-const layouts = {
-  card: [
-    { width: 320, height: 24, marginBottom: 12 },
-    { width: 280, height: 16, marginBottom: 8 },
-    { width: 240, height: 16 },
-  ],
-  avatar: [
-    {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
-      marginRight: 16,
-    },
-    {
-      flexDirection: "column" as const,
-      children: [
-        { width: 180, height: 18, marginBottom: 8 },
-        { width: 120, height: 14 },
-      ],
-    },
-  ],
-};
+const palettes = {
+  purple: { bone: "#edeafd", highlight: "#ddd7fa" },
+  grey: { bone: "#f2f2f2", highlight: "#e1e1e1" },
+} as const;
 
 export function App() {
-  const [mode, setMode] = useState<ColourMode>(ColourMode.Purple);
+  const [resolving, setResolving] = useState(false);
+  const [tone, setTone] = useState<keyof typeof palettes>("purple");
 
   return (
     <main
@@ -38,62 +21,80 @@ export function App() {
         color: "#1f1740",
       }}
     >
-      <header style={{ marginBottom: 32 }}>
-        <h1 style={{ margin: 0 }}>Skeleton</h1>
+      <header style={{ marginBottom: 24 }}>
+        <h1 style={{ margin: 0 }}>bonework</h1>
         <p style={{ color: "#5b5577", marginTop: 8 }}>
-          Thin, colour-aware skeleton loader for React Native.
+          CSS Anchor Positioning skeleton loader. Children stay mounted —
+          shimmer overlays paint exactly over their bounding boxes.
         </p>
       </header>
 
-      <section style={{ marginBottom: 24 }}>
-        <label style={{ marginRight: 16 }}>
+      <section style={{ marginBottom: 24, display: "flex", gap: 24 }}>
+        <label>
           <input
-            type="radio"
-            name="mode"
-            value={ColourMode.Purple}
-            checked={mode === ColourMode.Purple}
-            onChange={() => setMode(ColourMode.Purple)}
+            type="checkbox"
+            checked={resolving}
+            onChange={(event) => setResolving(event.target.checked)}
           />{" "}
-          Purple
+          resolving
         </label>
         <label>
           <input
             type="radio"
-            name="mode"
-            value={ColourMode.Grey}
-            checked={mode === ColourMode.Grey}
-            onChange={() => setMode(ColourMode.Grey)}
+            name="tone"
+            checked={tone === "purple"}
+            onChange={() => setTone("purple")}
           />{" "}
-          Grey
+          purple
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="tone"
+            checked={tone === "grey"}
+            onChange={() => setTone("grey")}
+          />{" "}
+          grey
         </label>
       </section>
 
       <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontSize: 14, textTransform: "uppercase" }}>Card</h2>
-        <div
-          style={{
-            padding: 16,
-            border: "1px solid #e7e1f5",
-            borderRadius: 12,
-          }}
-        >
-          <Skeleton layout={layouts.card} colourMode={mode} />
-        </div>
+        <h2 style={{ fontSize: 14, textTransform: "uppercase" }}>
+          Single block
+        </h2>
+        <Bonework resolving={resolving} palette={palettes[tone]}>
+          <p>The quick brown fox jumps over the lazy dog.</p>
+        </Bonework>
       </section>
 
-      <section>
+      <section style={{ marginBottom: 40 }}>
         <h2 style={{ fontSize: 14, textTransform: "uppercase" }}>
-          Avatar + lines
+          Nested levels
         </h2>
-        <div
-          style={{
-            padding: 16,
-            border: "1px solid #e7e1f5",
-            borderRadius: 12,
-          }}
-        >
-          <Skeleton layout={layouts.avatar} colourMode={mode} />
-        </div>
+        <Bonework resolving={resolving} palette={palettes[tone]} levels={2}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              padding: 16,
+              border: "1px solid #e7e1f5",
+              borderRadius: 12,
+            }}
+          >
+            <img
+              src="https://placehold.co/64x64"
+              alt=""
+              width={64}
+              height={64}
+              style={{ borderRadius: 32 }}
+            />
+            <div>
+              <strong>Acme Trading LLC</strong>
+              <p style={{ margin: 0, color: "#5b5577" }}>Treasury</p>
+            </div>
+          </div>
+        </Bonework>
       </section>
     </main>
   );

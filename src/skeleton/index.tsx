@@ -1,29 +1,31 @@
-import ReanimatedSkeleton from "react-native-reanimated-skeleton";
-import { type ReactElement, useMemo } from "react";
+import { Children, useId, type ReactElement } from "react";
 
-import { palettes } from "./palettes";
-import styles from "./styles";
-import { ColourMode, type Props } from "./types";
+import type { Props } from "./types";
+import { applyMask } from "./utils";
 
-export function Skeleton({
-  layout,
-  colourMode = ColourMode.Purple,
+export function Bonework({
+  children,
+  resolving = false,
+  levels = 1,
   palette,
-  animationType,
+  borderRadius = 4,
+  durationMs = 1400,
 }: Props): ReactElement {
-  const colours = useMemo(
-    () => palette ?? palettes[colourMode],
-    [palette, colourMode],
-  );
+  const id = useId().replace(/[^a-zA-Z0-9]/g, "");
+
+  if (resolving) {
+    return <>{children}</>;
+  }
 
   return (
-    <ReanimatedSkeleton
-      layout={layout}
-      isLoading
-      boneColor={colours.bone}
-      highlightColor={colours.highlight}
-      containerStyle={styles.container}
-      animationType={animationType}
-    />
+    <>
+      {Children.toArray(children).map((child, index) =>
+        applyMask(child, `--sk-${id}-${index}`, Math.max(1, levels), {
+          palette,
+          borderRadius,
+          durationMs,
+        }),
+      )}
+    </>
   );
 }

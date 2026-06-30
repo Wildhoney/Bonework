@@ -22,8 +22,7 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "paths": {
-      "@wildhoney/skeleton": ["./src/index.ts"],
-      "react-native": ["./node_modules/react-native-web"]
+      "bonework": ["./src/index.ts"]
     },
     "types": ["vitest/globals", "node"]
   },

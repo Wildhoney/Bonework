@@ -1,159 +1,182 @@
-<p align="center">
-  <img src="./media/logo.png" alt="Skeleton — anatomical loader" width="640" />
-</p>
+<div align="center">
+  <img src="./media/logo.png" width="475" />
 
-<h1 align="center">Skeleton</h1>
+<i>❝Ossa loquuntur, dum carnem expectamus.❞</i>
+<br />
+<sub>The bones speak while we wait for the flesh.</sub>
 
-<p align="center">
-  <em>Thin, colour-aware skeleton loader for React Native — a small themed wrapper around <code>react-native-reanimated-skeleton</code>.</em>
-</p>
+[![Checks](https://github.com/Wildhoney/Skeleton/actions/workflows/checks.yml/badge.svg)](https://github.com/Wildhoney/Skeleton/actions/workflows/checks.yml)
 
-<p align="center">
-  <a href="https://github.com/Wildhoney/Skeleton/actions/workflows/checks.yml">
-    <img src="https://github.com/Wildhoney/Skeleton/actions/workflows/checks.yml/badge.svg" alt="Checks" />
-  </a>
-</p>
+</div>
 
-<p align="center">
-  <a href="https://wildhoney.github.io/Skeleton/"><strong>View demo →</strong></a>
-</p>
+> CSS Anchor Positioning skeleton loader for React. Children stay mounted &mdash; shimmer overlays paint exactly over their bounding boxes, no measure-and-redraw.
+
+> **[View Live Demo →](https://wildhoney.github.io/Skeleton/)**
 
 ## Contents
 
-- [Why](#why)
-- [Install](#install)
-- [Usage](#usage)
-- [Colour modes](#colour-modes)
-- [Custom palette](#custom-palette)
-- [Layouts](#layouts)
-- [Animation type](#animation-type)
-- [Testing](#testing)
-- [API](#api)
+1. [Benefits](#benefits)
+1. [Getting started](#getting-started)
+1. [Palette](#palette)
+1. [Resolving the placeholder](#resolving-the-placeholder)
+1. [Anchoring deeper](#anchoring-deeper)
+1. [Tuning the overlay](#tuning-the-overlay)
+1. [Testing](#testing)
+1. [Browser support](#browser-support)
+1. [API](#api)
 
-## Why
+## Benefits
 
-`react-native-reanimated-skeleton` is excellent at the heavy lifting — measuring layouts, shimmering, animating — but every codebase ends up re-deriving the same two questions:
+- **Zero measurement** &ndash; CSS Anchor Positioning paints the shimmer exactly over each child's box via `position-anchor` + `anchor()`. No `ResizeObserver`, no measured-to-redraw flicker, no width/height props.
+- **Children stay mounted** &ndash; the real DOM remains in place (just `aria-hidden` and visually muted), so flipping `resolving` is jank-free &ndash; layout doesn't shift, focus order is preserved, and refs survive the transition.
+- **Caller-supplied palette** &ndash; every consumer threads their own design tokens through `palette={{ bone, highlight }}`. No baked-in colour modes to fight with.
+- **`levels` for nested layouts** &ndash; descend N levels before anchoring so a flex row's gaps and a grid's tracks stay intact while each leaf gets its own shimmer.
+- **Non-element nodes are fine** &ndash; strings, numbers, and fragments are wrapped in an anchored span so the shimmer still lands on them.
+- **Accessibility built in** &ndash; anchored elements get `aria-hidden="true"` and `tabIndex={-1}` so screen readers skip the placeholder and keyboard users can't focus dead controls.
 
-1. Which colours go on the bones and highlights?
-2. Where do the design tokens come from?
+## Getting started
 
-`Skeleton` answers both with a tiny opinionated wrapper:
-
-- Two built-in palettes (`Purple` and `Grey`) so the common cases need no configuration.
-- A `palette` prop for everything else — pass your own `{ bone, highlight }` and the design-system colour is locked in at the call site.
-- Forces `isLoading: true` because the caller is mounting the skeleton precisely to communicate loading — toggling it off here would be a bug.
-
-Everything else (`layout`, `animationType`) is a direct passthrough.
-
-## Install
+Install the package and pass the children you want to mask plus a palette of two colours &ndash; the bone (the still part) and the highlight (the brighter band that sweeps across).
 
 ```sh
-pnpm add @wildhoney/skeleton react-native-reanimated-skeleton
+pnpm add bonework
 ```
 
-`react-native-reanimated-skeleton` is a peer-dependent runtime — install it alongside.
-
-## Usage
-
 ```tsx
-import { Skeleton } from "@wildhoney/skeleton";
+import { Bonework } from "bonework";
 
-export function ProfileCardPlaceholder() {
+import { useProfile } from "./hooks";
+
+export function Profile(): React.ReactElement {
+  const profile = useProfile();
+
   return (
-    <Skeleton
-      layout={[
-        { width: 320, height: 24, marginBottom: 12 },
-        { width: 280, height: 16, marginBottom: 8 },
-        { width: 240, height: 16 },
-      ]}
-    />
+    <Bonework
+      resolving={profile !== null}
+      palette={{ bone: "#edeafd", highlight: "#ddd7fa" }}
+    >
+      <h1>{profile?.name ?? "Loading"}</h1>
+      <p>{profile?.bio ?? "Loading the bio"}</p>
+    </Bonework>
   );
 }
 ```
 
-That's the whole API for the common case — a `layout` describing the placeholder rows. The component renders the shimmering bones inside a `display: flex` container so it slots into any parent without wrapper noise.
+Two things to notice. First, `resolving` is a positive flag &mdash; pass `true` once the data has arrived. Second, the children are the *real* markup, not a skeleton stand-in. The shimmer is painted **over** them.
 
-## Colour modes
+## Palette
 
-Two presets ship with the package — `Purple` (default) and `Grey`. Pick the one that contrasts with the parent surface:
-
-```tsx
-import { ColourMode, Skeleton } from "@wildhoney/skeleton";
-
-<Skeleton layout={layout} colourMode={ColourMode.Grey} />;
-```
-
-The exact hex values are exported as `palettes` so they can be referenced from your design tokens:
-
-```ts
-import { palettes } from "@wildhoney/skeleton";
-
-palettes.purple; // { bone: "#edeafd", highlight: "#ddd7fa" }
-palettes.grey; // { bone: "#f2f2f2", highlight: "#e1e1e1" }
-```
-
-## Custom palette
-
-When neither preset is right, pass `palette` directly. `palette` overrides `colourMode`, so the typical pattern is to thread design-system tokens straight through:
+The `palette` prop is the only required colour configuration. Wire it straight to your design tokens so the skeleton stays in step with the rest of the surface:
 
 ```tsx
-import { Skeleton } from "@wildhoney/skeleton";
+import { Bonework } from "bonework";
 
 import { theme } from "../theme";
 
-<Skeleton
-  layout={layout}
+<Bonework
   palette={{
     bone: theme.colour.surface.muted,
     highlight: theme.colour.surface.bold,
   }}
-/>;
+>
+  ...
+</Bonework>;
 ```
 
-## Layouts
+The library deliberately ships no built-in palettes &mdash; bring your own.
 
-The `layout` prop is forwarded as-is to `react-native-reanimated-skeleton`. Each entry is either a single row (`{ width, height, ...style }`) or a nested group with its own `flexDirection` and `children` array. See the [upstream docs](https://github.com/akshay111meher/react-native-reanimated-skeleton) for the full grammar.
+## Resolving the placeholder
 
-## Animation type
-
-`animationType` is also passed through. Choose `"shiver"` (default), `"pulse"`, or `"none"`:
+The component reads `resolving` as a boolean. While it's `false` (default), every child is replaced with an anchored copy plus a shimmering overlay sibling. When it flips to `true`, the children render unmodified:
 
 ```tsx
-<Skeleton layout={layout} animationType="pulse" />
+const { data } = useQuery({ queryKey: ["profile"], queryFn });
+
+<Bonework resolving={!!data} palette={tokens}>
+  <h1>{data?.name ?? "Loading name"}</h1>
+</Bonework>;
+```
+
+There's no separate `loading` prop &mdash; `resolving` doubles as the only signal. Pass `true` precisely when you'd otherwise unmount the skeleton.
+
+## Anchoring deeper
+
+By default a single top-level overlay paints over each direct child. For composed layouts &mdash; a flex row, a grid, a card with a header and body &mdash; you usually want each *leaf* shimmering separately while the outer wrapper's gap/grid lines stay intact. Increase `levels`:
+
+```tsx
+<Bonework palette={tokens} levels={2}>
+  <div className="row">
+    <img src="..." />
+    <div>
+      <strong>Name</strong>
+      <p>Subline</p>
+    </div>
+  </div>
+</Bonework>
+```
+
+`levels={1}` anchors `<div className="row">` (one shimmer over the whole row). `levels={2}` anchors `<img>` and the inner `<div>`. `levels={3}` would descend further. The outer wrappers above the anchored level keep their styling (margins, flex, grid), so the placeholder looks right at every nesting depth.
+
+## Tuning the overlay
+
+Two optional props tweak how the overlay paints:
+
+- `borderRadius` &mdash; the radius applied to the overlay. Defaults to `4`. Number values become `px`; strings pass through (so `"50%"` for circles works).
+- `durationMs` &mdash; how long one shimmer pass takes. Defaults to `1400`.
+
+```tsx
+<Bonework
+  palette={tokens}
+  borderRadius="50%"
+  durationMs={1000}
+>
+  <Avatar />
+</Bonework>
 ```
 
 ## Testing
 
-For Jest / Vitest, `react-native-reanimated-skeleton` is best mocked — the real component depends on `react-native-reanimated`, which is awkward to spin up in a JSDOM environment. The mock just needs to surface the props you care about asserting on:
+The component renders the real DOM, just decorated with `aria-hidden` and anchor styles. Assert by querying for the anchored elements (`style.anchorName` starts with `--sk-`) or the overlay siblings (`aria-hidden="true"`). The library's own suite at [`src/skeleton/index.test.tsx`](./src/skeleton/index.test.tsx) is a good template.
 
-```ts
-vi.mock("react-native-reanimated-skeleton", () => ({
-  __esModule: true,
-  default: ({ boneColor, highlightColor }) => (
-    <div data-bone={boneColor} data-highlight={highlightColor} />
-  ),
-}));
+```tsx
+import { render } from "@testing-library/react";
+
+const { container } = render(
+  <Bonework palette={tokens}>
+    <p>Hello</p>
+  </Bonework>,
+);
+const p = container.querySelector("p");
+expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/);
 ```
 
-The library's own test suite uses exactly this pattern — see `src/skeleton/index.test.tsx`.
+## Browser support
+
+CSS Anchor Positioning is supported in Chromium-based browsers (Chrome / Edge / Brave 125+). Firefox and Safari are working through their respective implementations &mdash; once they ship, no application code needs to change. Until then, treat `bonework` as an enhancement: in unsupported browsers the overlay simply doesn't anchor, so the children remain visible behind their `aria-hidden` mask &mdash; readable, but not shimmering.
 
 ## API
 
 ```ts
+type Palette = { bone: string; highlight: string };
+
 type Props = {
-  layout: Array<LayoutEntry>; // from react-native-reanimated-skeleton
-  animationType?: "shiver" | "pulse" | "none";
-  colourMode?: ColourMode; // ColourMode.Purple (default) | ColourMode.Grey
-  palette?: { bone: string; highlight: string }; // overrides colourMode
+  children?: React.ReactNode;
+  resolving?: boolean;
+  levels?: number;
+  palette: Palette;
+  borderRadius?: number | string;
+  durationMs?: number;
 };
 ```
 
-| Prop            | Type                                  | Default               | Description                                                                                               |
-| --------------- | ------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------- |
-| `layout`        | `Array<LayoutEntry>`                  | —                     | Row / column descriptors forwarded to `react-native-reanimated-skeleton`.                                 |
-| `animationType` | `"shiver" \| "pulse" \| "none"`       | `"shiver"`            | Shimmer animation style.                                                                                  |
-| `colourMode`    | `ColourMode.Purple \| ColourMode.Grey` | `ColourMode.Purple`   | Built-in palette.                                                                                         |
-| `palette`       | `{ bone: string; highlight: string }` | —                     | Custom palette. Wins over `colourMode` when provided. Use this to thread your own design tokens straight through. |
+| Prop           | Type                | Default | Description                                                                                                                       |
+| -------------- | ------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `palette`      | `Palette`           | —       | `{ bone, highlight }` — endpoints of the shimmer gradient. Required.                                                              |
+| `children`     | `React.ReactNode`   | —       | The real markup that the skeleton will overlay.                                                                                   |
+| `resolving`    | `boolean`           | `false` | When `true`, children render unmodified. Flip it once data arrives.                                                               |
+| `levels`       | `number`            | `1`     | How many levels deep to descend before anchoring. `1` anchors `child`; `N` anchors each Nth-level descendant.                     |
+| `borderRadius` | `number \| string`  | `4`     | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                                                 |
+| `durationMs`   | `number`            | `1400`  | Shimmer sweep duration in milliseconds.                                                                                           |
 
 ## Licence
 

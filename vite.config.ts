@@ -6,7 +6,7 @@ import dts from "vite-plugin-dts";
 
 function serveExample(): Plugin {
   return {
-    name: "skeleton-serve-example",
+    name: "bonework-serve-example",
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
         const url = req.url ?? "/";
@@ -28,8 +28,7 @@ export default defineConfig(({ mode }) => {
   return {
     resolve: {
       alias: {
-        "@wildhoney/skeleton": resolve(__dirname, "src/index.ts"),
-        "react-native": "react-native-web",
+        bonework: resolve(__dirname, "src/index.ts"),
       },
     },
     plugins: isExample
@@ -59,18 +58,13 @@ export default defineConfig(({ mode }) => {
       : {
           lib: {
             entry: resolve(__dirname, "src/index.ts"),
-            name: "Skeleton",
+            name: "Bonework",
             fileName: (format) =>
-              format === "es" ? "skeleton.js" : `skeleton.${format}`,
+              format === "es" ? "bonework.js" : `bonework.${format}`,
             formats: ["es", "cjs"],
           },
           rollupOptions: {
-            external: [
-              "react",
-              "react/jsx-runtime",
-              "react-native",
-              "react-native-reanimated-skeleton",
-            ],
+            external: ["react", "react/jsx-runtime", "@emotion/css"],
             output: { globals: { react: "React" } },
           },
           sourcemap: true,

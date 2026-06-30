@@ -1,73 +1,75 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { ColourMode } from "./types";
-import { palettes } from "./palettes";
+import { Bonework } from "./index";
 
-vi.mock("react-native-reanimated-skeleton", () => ({
-  __esModule: true,
-  default: ({
-    boneColor,
-    highlightColor,
-    isLoading,
-  }: {
-    boneColor: string;
-    highlightColor: string;
-    isLoading: boolean;
-  }) => (
-    <div
-      data-testid="skeleton"
-      data-bone={boneColor}
-      data-highlight={highlightColor}
-      data-loading={String(isLoading)}
-    />
-  ),
-}));
-
-const { Skeleton } = await import("./index");
+const palette = { bone: "#eee", highlight: "#fff" } as const;
 
 afterEach(() => {
   cleanup();
 });
 
-describe("<Skeleton />", () => {
-  it("renders the purple palette by default", () => {
-    render(<Skeleton layout={[{ width: 100, height: 20 }]} />);
-    const node = screen.getByTestId("skeleton");
-    expect(node).toHaveAttribute("data-bone", palettes.purple.bone);
-    expect(node).toHaveAttribute("data-highlight", palettes.purple.highlight);
+describe("<Bonework />", () => {
+  it("renders children unmodified when resolving", () => {
+    const { container } = render(
+      <Bonework resolving palette={palette}>
+        <p>Hello</p>
+      </Bonework>,
+    );
+    expect(container.querySelectorAll("p")).toHaveLength(1);
+    expect(container.textContent).toBe("Hello");
+    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0);
   });
 
-  it("renders the grey palette when colourMode=Grey", () => {
-    render(
-      <Skeleton
-        layout={[{ width: 100, height: 20 }]}
-        colourMode={ColourMode.Grey}
-      />,
+  it("anchors each top-level child and pairs it with an overlay", () => {
+    const { container } = render(
+      <Bonework palette={palette}>
+        <p>Hello</p>
+        <p>World</p>
+      </Bonework>,
     );
-    const node = screen.getByTestId("skeleton");
-    expect(node).toHaveAttribute("data-bone", palettes.grey.bone);
-    expect(node).toHaveAttribute("data-highlight", palettes.grey.highlight);
+    const overlays = container.querySelectorAll('[aria-hidden="true"]');
+    expect(overlays.length).toBeGreaterThanOrEqual(2);
+    const paragraphs = container.querySelectorAll("p");
+    expect(paragraphs).toHaveLength(2);
+    paragraphs.forEach((p) =>
+      expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/),
+    );
   });
 
-  it("honours a custom palette over colourMode", () => {
-    render(
-      <Skeleton
-        layout={[{ width: 100, height: 20 }]}
-        colourMode={ColourMode.Grey}
-        palette={{ bone: "#ff0000", highlight: "#00ff00" }}
-      />,
+  it("descends to the requested levels", () => {
+    const { container } = render(
+      <Bonework palette={palette} levels={2}>
+        <div>
+          <span>A</span>
+          <span>B</span>
+        </div>
+      </Bonework>,
     );
-    const node = screen.getByTestId("skeleton");
-    expect(node).toHaveAttribute("data-bone", "#ff0000");
-    expect(node).toHaveAttribute("data-highlight", "#00ff00");
+    const anchored = [...container.querySelectorAll("span")].filter(
+      (span) => span.style.anchorName !== "",
+    );
+    expect(anchored).toHaveLength(2);
+    expect(anchored[0]?.textContent).toBe("A");
+    expect(anchored[1]?.textContent).toBe("B");
   });
 
-  it("forces isLoading=true regardless of caller intent", () => {
-    render(<Skeleton layout={[{ width: 100, height: 20 }]} />);
-    expect(screen.getByTestId("skeleton")).toHaveAttribute(
-      "data-loading",
-      "true",
+  it("wraps non-element children in an anchored span", () => {
+    const { container } = render(
+      <Bonework palette={palette}>plain text</Bonework>,
     );
+    const wrapper = container.querySelector("span[aria-hidden='true']");
+    expect(wrapper).not.toBeNull();
+    expect((wrapper as HTMLElement).style.anchorName).toMatch(/^--sk-/);
+  });
+
+  it("clamps levels below 1 to 1", () => {
+    const { container } = render(
+      <Bonework palette={palette} levels={0}>
+        <p>Hello</p>
+      </Bonework>,
+    );
+    const p = container.querySelector("p");
+    expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/);
   });
 });

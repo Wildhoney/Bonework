@@ -1,8 +1,11 @@
-import { type ISkeletonProps } from "react-native-reanimated-skeleton";
+import type { CSSProperties, ReactNode } from "react";
 
-export enum ColourMode {
-  Purple = "purple",
-  Grey = "grey",
+declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface CSSProperties {
+    anchorName?: string;
+    positionAnchor?: string;
+  }
 }
 
 export type Palette = {
@@ -10,7 +13,17 @@ export type Palette = {
   highlight: string;
 };
 
-export type Props = Pick<ISkeletonProps, "layout" | "animationType"> & {
-  colourMode?: ColourMode;
-  palette?: Palette;
+export type ElementProps = {
+  children?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+};
+
+export type Props = {
+  children?: ReactNode;
+  resolving?: boolean;
+  levels?: number;
+  palette: Palette;
+  borderRadius?: number | string;
+  durationMs?: number;
 };
