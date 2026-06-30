@@ -24,9 +24,9 @@ export function overlay(
     inset-inline-start: anchor(left);
     inset-inline-end: anchor(right);
     inset-block-end: anchor(bottom);
-    border-radius: ${typeof borderRadius === "number"
-      ? `${borderRadius}px`
-      : borderRadius};
+    border-radius: ${
+      typeof borderRadius === "number" ? `${borderRadius}px` : borderRadius
+    };
     background-image: linear-gradient(
       90deg,
       ${palette.bone} 0%,

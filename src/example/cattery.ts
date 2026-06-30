@@ -75,7 +75,8 @@ async function fetchImageUrl(): Promise<string> {
 }
 
 function pickProfile(): Profile {
-  const profile = profiles[nextProfile % profiles.length]!;
+  const profile = profiles[nextProfile % profiles.length];
+  if (!profile) throw new Error("Cattery has no profiles to offer.");
   nextProfile++;
   return profile;
 }

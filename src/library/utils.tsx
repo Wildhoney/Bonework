@@ -56,18 +56,18 @@ function Mask({ child, anchor, options }: MaskProps): ReactElement {
     if (computed && computed !== "0px") setRadius(computed);
   }, []);
 
-  const anchored: ReactNode = isValidElement(child)
-    ? cloneAnchor(child as ReactElement<ElementProps>, anchor, measure)
-    : (
-        <span
-          ref={measure}
-          aria-hidden="true"
-          className={muted}
-          style={{ anchorName: anchor }}
-        >
-          {child}
-        </span>
-      );
+  const anchored: ReactNode = isValidElement(child) ? (
+    cloneAnchor(child as ReactElement<ElementProps>, anchor, measure)
+  ) : (
+    <span
+      ref={measure}
+      aria-hidden="true"
+      className={muted}
+      style={{ anchorName: anchor }}
+    >
+      {child}
+    </span>
+  );
 
   const overlayClass = overlay(
     options.palette,

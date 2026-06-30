@@ -62,7 +62,7 @@ export function Profile(): React.ReactElement {
 }
 ```
 
-Two things to notice. First, `resolving` is a positive flag &mdash; pass `true` once the data has arrived. Second, the children are the *real* markup, not a skeleton stand-in. The shimmer is painted **over** them.
+Two things to notice. First, `resolving` is a positive flag &mdash; pass `true` once the data has arrived. Second, the children are the _real_ markup, not a skeleton stand-in. The shimmer is painted **over** them.
 
 ## Palette
 
@@ -101,7 +101,7 @@ There's no separate `loading` prop &mdash; `resolving` doubles as the only signa
 
 ## Anchoring deeper
 
-By default a single top-level overlay paints over each direct child. For composed layouts &mdash; a flex row, a grid, a card with a header and body &mdash; you usually want each *leaf* shimmering separately while the outer wrapper's gap/grid lines stay intact. Increase `levels`:
+By default a single top-level overlay paints over each direct child. For composed layouts &mdash; a flex row, a grid, a card with a header and body &mdash; you usually want each _leaf_ shimmering separately while the outer wrapper's gap/grid lines stay intact. Increase `levels`:
 
 ```tsx
 <Bonework palette={tokens} levels={2}>
@@ -125,11 +125,7 @@ Two optional props tweak how the overlay paints:
 - `durationMs` &mdash; how long one shimmer pass takes. Defaults to `1400`.
 
 ```tsx
-<Bonework
-  palette={tokens}
-  borderRadius="50%"
-  durationMs={1000}
->
+<Bonework palette={tokens} borderRadius="50%" durationMs={1000}>
   <Avatar />
 </Bonework>
 ```
@@ -169,14 +165,14 @@ type Props = {
 };
 ```
 
-| Prop           | Type                | Default | Description                                                                                                                       |
-| -------------- | ------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `palette`      | `Palette`           | —       | `{ bone, highlight }` — endpoints of the shimmer gradient. Required.                                                              |
-| `children`     | `React.ReactNode`   | —       | The real markup that the skeleton will overlay.                                                                                   |
-| `resolving`    | `boolean`           | `false` | When `true`, children render unmodified. Flip it once data arrives.                                                               |
-| `levels`       | `number`            | `1`     | How many levels deep to descend before anchoring. `1` anchors `child`; `N` anchors each Nth-level descendant.                     |
-| `borderRadius` | `number \| string`  | `4`     | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                                                 |
-| `durationMs`   | `number`            | `1400`  | Shimmer sweep duration in milliseconds.                                                                                           |
+| Prop           | Type               | Default | Description                                                                                                   |
+| -------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------- |
+| `palette`      | `Palette`          | —       | `{ bone, highlight }` — endpoints of the shimmer gradient. Required.                                          |
+| `children`     | `React.ReactNode`  | —       | The real markup that the skeleton will overlay.                                                               |
+| `resolving`    | `boolean`          | `false` | When `true`, children render unmodified. Flip it once data arrives.                                           |
+| `levels`       | `number`           | `1`     | How many levels deep to descend before anchoring. `1` anchors `child`; `N` anchors each Nth-level descendant. |
+| `borderRadius` | `number \| string` | `4`     | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                             |
+| `durationMs`   | `number`           | `1400`  | Shimmer sweep duration in milliseconds.                                                                       |
 
 ## Licence
 

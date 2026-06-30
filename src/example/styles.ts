@@ -18,7 +18,11 @@ const tokens = {
 } as const;
 
 export const page = css`
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   max-width: 960px;
   margin: 0 auto;
   padding: ${tokens.spacing.xl} ${tokens.spacing.l} 96px;

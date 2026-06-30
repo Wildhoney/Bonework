@@ -1,5 +1,5 @@
 import { cleanup, render } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Bonework } from "./index";
 
@@ -7,6 +7,7 @@ const palette = { bone: "#eee", highlight: "#fff" } as const;
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
 });
 
 describe("<Bonework />", () => {
@@ -71,5 +72,26 @@ describe("<Bonework />", () => {
     );
     const p = container.querySelector("p");
     expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/);
+  });
+
+  it("passes a string borderRadius through verbatim", () => {
+    const { container } = render(
+      <Bonework palette={palette} borderRadius="1rem">
+        <p>Hello</p>
+      </Bonework>,
+    );
+    expect(container.querySelector("p")).not.toBeNull();
+  });
+
+  it("adopts the child's computed border-radius when non-zero", () => {
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      borderRadius: "12px",
+    } as CSSStyleDeclaration);
+    const { container } = render(
+      <Bonework palette={palette}>
+        <p>Hello</p>
+      </Bonework>,
+    );
+    expect(container.querySelector("p")).not.toBeNull();
   });
 });
