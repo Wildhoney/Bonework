@@ -1,6 +1,6 @@
 {
   "name": "bonework",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CSS Anchor Positioning skeleton loader for React — shimmer overlays painted exactly over the real DOM, no measure-and-redraw.",
   "type": "module",
   "packageManager": "pnpm@11.9.0",
