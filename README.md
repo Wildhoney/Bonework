@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./media/logo.png" width="475" />
+  <img src="./media/logo-v2.png" width="475" />
 
 <i>❝Ossa loquuntur, dum carnem expectamus.❞</i>
 <br />
@@ -106,6 +106,6 @@ By default a single shimmer paints over each direct child. For composed layouts 
 - [Browsers](./recipes/browser-support.md) &mdash; support matrix and progressive-enhancement notes.
 - [API](./recipes/api.md) &mdash; full type reference.
 
-## Licence
+---
 
-[MIT](./LICENSE) © Adam Timberlake
+<sub>MIT © Adam Timberlake</sub>
