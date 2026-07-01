@@ -27,8 +27,9 @@ expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/);
 The shimmer is a sibling `<span aria-hidden="true">`. Count them if you need to.
 
 ```tsx
-expect(container.querySelectorAll('[aria-hidden="true"]').length)
-  .toBeGreaterThan(0);
+expect(
+  container.querySelectorAll('[aria-hidden="true"]').length,
+).toBeGreaterThan(0);
 ```
 
 ## Test the `useBonework()` hook

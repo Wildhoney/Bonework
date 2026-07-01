@@ -73,11 +73,11 @@ The default is exported as `defaultPalette` if you want to spread over it.
 
 `useBonework()` returns `{ skeleton, placeholder }`. `placeholder(actual, fallback)` handles the common trap where a hard-coded default (`data.currency ?? "AED"`) leaks past resolution:
 
-| `actual`             | `skeleton`  | Returns    |
-| -------------------- | ----------- | ---------- |
-| present              | either      | `actual`   |
-| `null` / `undefined` | `true`      | `fallback` |
-| `null` / `undefined` | `false`     | `null`     |
+| `actual`             | `skeleton` | Returns    |
+| -------------------- | ---------- | ---------- |
+| present              | either     | `actual`   |
+| `null` / `undefined` | `true`     | `fallback` |
+| `null` / `undefined` | `false`    | `null`     |
 
 Outside a `<Bonework>` the hook is still safe: `placeholder` just returns `actual ?? null`.
 

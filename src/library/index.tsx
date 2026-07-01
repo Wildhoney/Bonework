@@ -40,8 +40,7 @@ export function Bonework({
       placeholder: <T, F>(
         actual: T | null | undefined,
         fallback: F,
-      ): T | F | null =>
-        actual != null ? actual : skeleton ? fallback : null,
+      ): T | F | null => (actual != null ? actual : skeleton ? fallback : null),
     }),
     [skeleton],
   );

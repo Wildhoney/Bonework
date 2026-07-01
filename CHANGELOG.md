@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.2.0](https://github.com/Wildhoney/Bonework/compare/v0.1.3...v0.2.0) (2026-07-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* add useBonework() hook and rename core props
+
+### Features
+
+* add useBonework() hook and rename core props ([4c5acd2](https://github.com/Wildhoney/Bonework/commit/4c5acd285d8bb55ddb361126fa38c2537742c0f0))
+* make palette optional with a neutral default ([5c66ed7](https://github.com/Wildhoney/Bonework/commit/5c66ed7f22ce253db46d6f5ef751e52917c9bb6e)), closes [#e5e7](https://github.com/Wildhoney/Bonework/issues/e5e7) [#f3f4f6](https://github.com/Wildhoney/Bonework/issues/f3f4f6)
+
 ## [0.1.3](https://github.com/Wildhoney/Bonework/compare/v0.1.2...v0.1.3) (2026-06-30)
 
 ## [0.1.2](https://github.com/Wildhoney/Bonework/compare/v0.1.1...v0.1.2) (2026-06-30)

@@ -38,14 +38,14 @@ type BoneworkState = {
 
 ## `<Bonework>` props
 
-| Prop       | Type               | Default          | Description                                                                                                   |
-| ---------- | ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `children` | `React.ReactNode`  | —                | The real markup that the skeleton will overlay.                                                               |
-| `skeleton` | `boolean`          | `false`          | While `true`, children get shimmered. Flip off when data arrives.                                             |
-| `palette`  | `Palette`          | `defaultPalette` | `{ bone, highlight }` &mdash; endpoints of the shimmer gradient.                                              |
+| Prop       | Type               | Default          | Description                                                                                                         |
+| ---------- | ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `children` | `React.ReactNode`  | —                | The real markup that the skeleton will overlay.                                                                     |
+| `skeleton` | `boolean`          | `false`          | While `true`, children get shimmered. Flip off when data arrives.                                                   |
+| `palette`  | `Palette`          | `defaultPalette` | `{ bone, highlight }` &mdash; endpoints of the shimmer gradient.                                                    |
 | `levels`   | `number`           | `1`              | How many levels deep to descend before anchoring. `1` anchors each direct child; `N` anchors Nth-level descendants. |
-| `radius`   | `number \| string` | `4`              | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                             |
-| `duration` | `number`           | `1_400`          | Shimmer sweep duration in milliseconds.                                                                       |
+| `radius`   | `number \| string` | `4`              | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                                   |
+| `duration` | `number`           | `1_400`          | Shimmer sweep duration in milliseconds.                                                                             |
 
 ## `useBonework()`
 
