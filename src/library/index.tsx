@@ -2,13 +2,14 @@ import {
   Children,
   createContext,
   useContext,
+  useEffect,
   useId,
   useMemo,
   type ReactElement,
 } from "react";
 
 import type { BoneworkState, Palette, Props } from "./types";
-import { applyMask } from "./utils";
+import { applyMask, supportsAnchorPositioning } from "./utils";
 
 export const defaultPalette: Palette = {
   bone: "#e5e7eb",
@@ -44,6 +45,13 @@ export function Bonework({
     }),
     [skeleton],
   );
+
+  useEffect(() => {
+    if (!skeleton || supportsAnchorPositioning()) return;
+    void import("@oddbird/css-anchor-positioning/fn").then(
+      ({ default: polyfill }) => polyfill(),
+    );
+  }, [skeleton, id]);
 
   if (!skeleton) {
     return (

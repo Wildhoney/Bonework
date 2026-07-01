@@ -10,13 +10,13 @@ Bonework is built on [CSS Anchor Positioning](https://developer.mozilla.org/en-U
 
 ## What happens in unsupported browsers
 
-Bonework feature-detects `anchor-name` at render time and swaps to an in-place fallback when it's missing. In a browser that doesn't understand `anchor()` and `position-anchor`:
+Bonework feature-detects `anchor-name` at render time. When it's missing, it lazily loads [`@oddbird/css-anchor-positioning`](https://github.com/oddbird/css-anchor-positioning) &mdash; a JavaScript polyfill that reads `anchor()` and `position-anchor` from stylesheets and computes the equivalent inline styles.
 
-- Each anchored element becomes `position: relative` and hosts the shimmer as an absolutely-positioned inner `<span>` (`inset: 0`).
-- Its real children are wrapped in a `visibility: hidden` span so layout is preserved but content is not painted.
-- `useBonework()`, `placeholder(...)`, and `skeleton` toggling all keep working &mdash; none of them depend on the CSS feature.
+- Chromium-family browsers get the pure-CSS path. **The polyfill chunk is never fetched.**
+- Safari and Firefox lazily fetch the polyfill on the first `<Bonework skeleton>` mount and run it once.
+- Your DOM is not restructured &mdash; no wrappers, no injected children, no `position: relative` overrides. The polyfill only writes computed positioning styles on the overlay elements Bonework already renders.
 
-The shimmer therefore shows up in every browser; only the *technique* differs. Once Firefox and Safari ship anchor positioning, they graduate automatically to the fixed-overlay path.
+The polyfill is a runtime dependency (installed automatically), imported via `import("@oddbird/css-anchor-positioning/fn")` from a `useEffect`. Bundlers (Vite, Rollup, webpack) code-split it into a separate chunk that supported browsers never download.
 
 ## Detecting support yourself
 

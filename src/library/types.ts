@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode, Ref } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 declare module "react" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -37,13 +37,6 @@ export type Config = {
 export type MaskProps = {
   child: ReactNode;
   anchor: string;
-  config: Config;
-};
-
-export type FallbackProps = {
-  child: ReactNode;
-  measure: Ref<HTMLElement>;
-  radius: string | null;
   config: Config;
 };
 

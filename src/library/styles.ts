@@ -13,15 +13,6 @@ export const muted = css`
   user-select: none;
 `;
 
-export const hidden = css`
-  visibility: hidden;
-`;
-
-export const inlineHost = css`
-  position: relative;
-  display: inline-block;
-`;
-
 export function overlay(
   palette: Palette,
   radius: number | string,
@@ -33,28 +24,6 @@ export function overlay(
     inset-inline-start: anchor(left);
     inset-inline-end: anchor(right);
     inset-block-end: anchor(bottom);
-    border-radius: ${typeof radius === "number" ? `${radius}px` : radius};
-    background-image: linear-gradient(
-      90deg,
-      ${palette.bone} 0%,
-      ${palette.highlight} 50%,
-      ${palette.bone} 100%
-    );
-    background-size: 200% 100%;
-    animation: ${shimmer} ${duration}ms ease-in-out infinite;
-    pointer-events: none;
-    z-index: 1;
-  `;
-}
-
-export function fallbackOverlay(
-  palette: Palette,
-  radius: number | string,
-  duration: number,
-): string {
-  return css`
-    position: absolute;
-    inset: 0;
     border-radius: ${typeof radius === "number" ? `${radius}px` : radius};
     background-image: linear-gradient(
       90deg,

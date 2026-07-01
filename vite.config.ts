@@ -64,7 +64,12 @@ export default defineConfig(({ mode }) => {
             formats: ["es", "cjs"],
           },
           rollupOptions: {
-            external: ["react", "react/jsx-runtime", "@emotion/css"],
+            external: [
+              "react",
+              "react/jsx-runtime",
+              "@emotion/css",
+              "@oddbird/css-anchor-positioning/fn",
+            ],
             output: { globals: { react: "React" } },
           },
           sourcemap: true,
