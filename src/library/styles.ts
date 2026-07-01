@@ -1,6 +1,13 @@
-import { css, keyframes } from "@emotion/css";
+import createEmotion from "@emotion/css/create-instance";
 
 import type { Palette } from "./types";
+
+const { css, cx, keyframes } = createEmotion({
+  key: "bonework",
+  speedy: false,
+});
+
+export { cx };
 
 const shimmer = keyframes`
   0% { background-position: 200% 0; }

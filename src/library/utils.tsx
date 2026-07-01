@@ -1,4 +1,3 @@
-import { cx } from "@emotion/css";
 import {
   Children,
   Fragment,
@@ -11,7 +10,7 @@ import {
   type Ref,
 } from "react";
 
-import { muted, overlay } from "./styles";
+import { cx, muted, overlay } from "./styles";
 import type { Config, ElementProps, MaskProps } from "./types";
 
 export function supportsAnchorPositioning(): boolean {
