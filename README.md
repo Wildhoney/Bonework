@@ -9,7 +9,7 @@
 
 </div>
 
-> Minimal-effort skeleton loaders for React &mdash; wrap what you already render, and shimmers align themselves to the real DOM. No sizing props, no skeleton stand-ins, no drift as your UI evolves.
+> Minimal-effort skeleton loaders for React &mdash; wrap what you already render, and CSS Anchor Positioning keeps shimmers aligned to the real DOM. No sizing props, no skeleton stand-ins, no drift as your UI evolves.
 
 > **[View Live Demo →](https://wildhoney.github.io/Bonework/)**
 
