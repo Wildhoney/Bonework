@@ -7,8 +7,13 @@ import {
   type ReactElement,
 } from "react";
 
-import type { BoneworkState, Props } from "./types";
+import type { BoneworkState, Palette, Props } from "./types";
 import { applyMask } from "./utils";
+
+export const defaultPalette: Palette = {
+  bone: "#e5e7eb",
+  highlight: "#f3f4f6",
+};
 
 const BoneworkContext = createContext<BoneworkState>({
   skeleton: false,
@@ -23,7 +28,7 @@ export function Bonework({
   children,
   skeleton = false,
   levels = 1,
-  palette,
+  palette = defaultPalette,
   radius = 4,
   duration = 1_400,
 }: Props): ReactElement {

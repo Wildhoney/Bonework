@@ -5,6 +5,7 @@
 ```ts
 import {
   Bonework,
+  defaultPalette,
   useBonework,
   type BoneworkProps,
   type BoneworkState,
@@ -21,7 +22,7 @@ type BoneworkProps = {
   children?: React.ReactNode;
   skeleton?: boolean;
   levels?: number;
-  palette: Palette;
+  palette?: Palette;
   radius?: number | string;
   duration?: number;
 };
@@ -37,14 +38,14 @@ type BoneworkState = {
 
 ## `<Bonework>` props
 
-| Prop       | Type               | Default | Description                                                                                                   |
-| ---------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------- |
-| `palette`  | `Palette`          | —       | `{ bone, highlight }` &mdash; endpoints of the shimmer gradient. Required.                                    |
-| `children` | `React.ReactNode`  | —       | The real markup that the skeleton will overlay.                                                               |
-| `skeleton` | `boolean`          | `false` | While `true`, children get shimmered. Flip off when data arrives.                                             |
-| `levels`   | `number`           | `1`     | How many levels deep to descend before anchoring. `1` anchors each direct child; `N` anchors Nth-level descendants. |
-| `radius`   | `number \| string` | `4`     | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                             |
-| `duration` | `number`           | `1_400` | Shimmer sweep duration in milliseconds.                                                                       |
+| Prop       | Type               | Default          | Description                                                                                                   |
+| ---------- | ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `children` | `React.ReactNode`  | —                | The real markup that the skeleton will overlay.                                                               |
+| `skeleton` | `boolean`          | `false`          | While `true`, children get shimmered. Flip off when data arrives.                                             |
+| `palette`  | `Palette`          | `defaultPalette` | `{ bone, highlight }` &mdash; endpoints of the shimmer gradient.                                              |
+| `levels`   | `number`           | `1`              | How many levels deep to descend before anchoring. `1` anchors each direct child; `N` anchors Nth-level descendants. |
+| `radius`   | `number \| string` | `4`              | Radius applied to the shimmer overlay. Numbers become `px`; strings pass through.                             |
+| `duration` | `number`           | `1_400`          | Shimmer sweep duration in milliseconds.                                                                       |
 
 ## `useBonework()`
 

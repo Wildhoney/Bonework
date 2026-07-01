@@ -1,4 +1,4 @@
-export { Bonework, useBonework } from "./library";
+export { Bonework, defaultPalette, useBonework } from "./library";
 export type {
   BoneworkState,
   Palette,

@@ -96,6 +96,16 @@ describe("<Bonework />", () => {
     );
     expect(container.querySelector("p")).not.toBeNull();
   });
+
+  it("renders without an explicit palette using the default", () => {
+    const { container } = render(
+      <Bonework skeleton>
+        <p>Hello</p>
+      </Bonework>,
+    );
+    const p = container.querySelector("p");
+    expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/);
+  });
 });
 
 describe("useBonework()", () => {

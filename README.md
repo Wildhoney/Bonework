@@ -35,16 +35,13 @@ pnpm add bonework
 import { Bonework, useBonework } from "bonework";
 
 function Currency({ actual }: { actual: string | null }) {
-  const { placeholder } = useBonework();
-  return <span>{placeholder(actual, "AED")}</span>;
+  const bonework = useBonework();
+  return <span>{bonework.placeholder(actual, "AED")}</span>;
 }
 
 export function Wallet({ data }: { data: Wallet | null }) {
   return (
-    <Bonework
-      skeleton={!data}
-      palette={{ bone: "#edeafd", highlight: "#ddd7fa" }}
-    >
+    <Bonework skeleton={!data}>
       <h1>{data?.name ?? "Placeholder name"}</h1>
       <Currency actual={data?.currency ?? null} />
     </Bonework>
@@ -56,7 +53,7 @@ Two moving parts. `<Bonework>` wraps the real UI and paints shimmers over it via
 
 ## Palette
 
-`palette` is the only required styling &mdash; `{ bone, highlight }`, wired to your design tokens. `bone` is the still band; `highlight` is the sweep.
+Bonework ships a neutral default (`{ bone: "#e5e7eb", highlight: "#f3f4f6" }`), so you can drop it in without wiring anything. Pass `palette` to align the shimmer with your design tokens &mdash; `bone` is the still band, `highlight` is the sweep:
 
 ```tsx
 <Bonework
@@ -70,7 +67,7 @@ Two moving parts. `<Bonework>` wraps the real UI and paints shimmers over it via
 </Bonework>
 ```
 
-No built-in palettes ship &mdash; bring your own.
+The default is exported as `defaultPalette` if you want to spread over it.
 
 ## Placeholder
 

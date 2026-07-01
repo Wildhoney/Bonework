@@ -23,7 +23,7 @@ export type Props = {
   children?: ReactNode;
   skeleton?: boolean;
   levels?: number;
-  palette: Palette;
+  palette?: Palette;
   radius?: number | string;
   duration?: number;
 };
