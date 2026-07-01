@@ -6,10 +6,19 @@ import {
 } from "@tanstack/react-query";
 import { useState, type ReactElement } from "react";
 
-import { Bonework } from "bonework";
+import { Bonework, useBonework } from "bonework";
 
 import { cattery, type Cat } from "./cattery";
 import * as styles from "./styles";
+
+function CatBio({ actual }: { actual: string | null }): ReactElement | null {
+  const bonework = useBonework();
+  const bio = bonework.placeholder(
+    actual,
+    "Just stepped through the cattery door. Give the staff a moment to write up the paperwork.",
+  );
+  return bio == null ? null : <>{bio}</>;
+}
 
 const client = new QueryClient({
   defaultOptions: {
@@ -23,7 +32,7 @@ const placeholder: Cat = {
   breed: "Settling in",
   avatar:
     "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23edeafd'/></svg>",
-  bio: "Just stepped through the cattery door. Give the staff a moment to write up the paperwork.",
+  bio: null,
   age: 0,
 };
 
@@ -91,7 +100,7 @@ function Cattery(): ReactElement {
               key={cat.id}
               skeleton={skeleton}
               palette={styles.palette}
-              levels={3}
+              levels={2}
             >
               <article className={styles.card}>
                 <img
@@ -102,12 +111,12 @@ function Cattery(): ReactElement {
                   className={styles.avatar}
                 />
                 <h3 className={styles.name}>{cat.name}</h3>
-                <div>
-                  <p className={styles.meta}>
-                    {cat.breed} · {cat.age} yr
-                  </p>
-                </div>
-                <p className={styles.bio}>{cat.bio}</p>
+                <p className={styles.meta}>
+                  {cat.breed} · {cat.age} yr
+                </p>
+                <p className={styles.bio}>
+                  <CatBio actual={cat.bio} />
+                </p>
               </article>
             </Bonework>
           );

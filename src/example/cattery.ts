@@ -3,7 +3,7 @@ export type Cat = {
   name: string;
   breed: string;
   avatar: string;
-  bio: string;
+  bio: string | null;
   age: number;
 };
 
@@ -49,7 +49,7 @@ const profiles: Profile[] = [
   {
     name: "Octavius",
     breed: "Devon Rex",
-    bio: "Permanently surprised, in a charming way. Squeaks instead of meows.",
+    bio: null,
     age: 7,
   },
   {

@@ -105,7 +105,3 @@ By default a single shimmer paints over each direct child. For composed layouts 
 - [Testing](./recipes/testing.md) &mdash; asserting on anchored elements and testing the hook.
 - [Browsers](./recipes/browser-support.md) &mdash; support matrix and progressive-enhancement notes.
 - [API](./recipes/api.md) &mdash; full type reference.
-
----
-
-<sub>MIT © Adam Timberlake</sub>
