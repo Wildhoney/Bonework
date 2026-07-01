@@ -39,13 +39,16 @@ const aed = new Intl.NumberFormat("en-AE", {
   currency: "AED",
 });
 
-function Balance({ amount }: { amount: number | null }) {
+type BalanceProps = { amount: number | null };
+type WalletProps = { data: Wallet | null };
+
+function Balance({ amount }: BalanceProps) {
   const bonework = useBonework();
   const formatted = amount != null ? aed.format(amount) : null;
   return <span>{bonework.placeholder(formatted, aed.format(0))}</span>;
 }
 
-export function Wallet({ data }: { data: Wallet | null }) {
+export function Wallet({ data }: WalletProps) {
   return (
     <Bonework skeleton={!data}>
       <h1>{data?.name ?? "Placeholder name"}</h1>

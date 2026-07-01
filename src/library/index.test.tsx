@@ -74,9 +74,7 @@ describe("<Bonework />", () => {
     expect(overlays.length).toBeGreaterThanOrEqual(2);
     const paragraphs = container.querySelectorAll("p");
     expect(paragraphs).toHaveLength(2);
-    paragraphs.forEach((p) =>
-      expect(p.className).toMatch(/bonework-/),
-    );
+    paragraphs.forEach((p) => expect(p.className).toMatch(/bonework-/));
   });
 
   it("descends to the requested levels", () => {

@@ -52,9 +52,7 @@ function Mask({ child, anchor, config }: MaskProps): ReactElement {
 
     const isTextLeaf =
       node.childNodes.length > 0 &&
-      Array.from(node.childNodes).every(
-        (n) => n.nodeType === Node.TEXT_NODE,
-      );
+      Array.from(node.childNodes).every((n) => n.nodeType === Node.TEXT_NODE);
     if (!isTextLeaf) return;
 
     const measureLines = (): void => {
@@ -82,7 +80,10 @@ function Mask({ child, anchor, config }: MaskProps): ReactElement {
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(node);
-    window.addEventListener("scroll", measure, { passive: true, capture: true });
+    window.addEventListener("scroll", measure, {
+      passive: true,
+      capture: true,
+    });
     window.addEventListener("resize", measure);
     return () => {
       observer.disconnect();
@@ -96,11 +97,7 @@ function Mask({ child, anchor, config }: MaskProps): ReactElement {
   const anchored: ReactNode = isValidElement(child) ? (
     cloneAnchor(child as ReactElement<ElementProps>, anchorClass, setNode)
   ) : (
-    <span
-      ref={setNode}
-      aria-hidden="true"
-      className={cx(muted, anchorClass)}
-    >
+    <span ref={setNode} aria-hidden="true" className={cx(muted, anchorClass)}>
       {child}
     </span>
   );
