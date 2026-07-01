@@ -1,4 +1,5 @@
 export { Bonework, defaultPalette, useBonework } from "./library";
+export { supportsAnchorPositioning } from "./library/utils";
 export type {
   BoneworkState,
   Palette,

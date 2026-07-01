@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 
 declare module "react" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -26,6 +26,25 @@ export type Props = {
   palette?: Palette;
   radius?: number | string;
   duration?: number;
+};
+
+export type Config = {
+  palette: Palette;
+  radius: number | string;
+  duration: number;
+};
+
+export type MaskProps = {
+  child: ReactNode;
+  anchor: string;
+  config: Config;
+};
+
+export type FallbackProps = {
+  child: ReactNode;
+  measure: Ref<HTMLElement>;
+  radius: string | null;
+  config: Config;
 };
 
 export type BoneworkState = {

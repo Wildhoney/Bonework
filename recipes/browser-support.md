@@ -10,21 +10,24 @@ Bonework is built on [CSS Anchor Positioning](https://developer.mozilla.org/en-U
 
 ## What happens in unsupported browsers
 
-Treat Bonework as a **progressive enhancement**. In a browser that doesn't understand `anchor()` and `position-anchor`:
+Bonework feature-detects `anchor-name` at render time and swaps to an in-place fallback when it's missing. In a browser that doesn't understand `anchor()` and `position-anchor`:
 
-- Your real DOM still renders. It's just decorated with `aria-hidden="true"` and visually muted while `skeleton` is `true`.
-- The overlay `<span>` exists in the DOM but has nothing to anchor to, so no shimmer is drawn.
-- Everything else &mdash; the `useBonework()` hook, `placeholder(...)`, `skeleton` toggling &mdash; still works, because none of that depends on the CSS feature.
+- Each anchored element becomes `position: relative` and hosts the shimmer as an absolutely-positioned inner `<span>` (`inset: 0`).
+- Its real children are wrapped in a `visibility: hidden` span so layout is preserved but content is not painted.
+- `useBonework()`, `placeholder(...)`, and `skeleton` toggling all keep working &mdash; none of them depend on the CSS feature.
 
-The result: no crash, no missing content, just a subtler placeholder state. Once Firefox and Safari catch up, the shimmer switches on automatically for those users.
+The shimmer therefore shows up in every browser; only the *technique* differs. Once Firefox and Safari ship anchor positioning, they graduate automatically to the fixed-overlay path.
 
-## Detecting support at runtime
+## Detecting support yourself
 
-If you want a JavaScript fallback (say, a spinner) in unsupported browsers, feature-detect once and branch:
+Bonework re-exports its detector if you want to branch elsewhere in your UI:
 
 ```ts
-export const supportsAnchorPositioning =
-  typeof CSS !== "undefined" && CSS.supports("anchor-name: --x");
+import { supportsAnchorPositioning } from "bonework";
+
+if (!supportsAnchorPositioning()) {
+  // e.g. skip a decoration that assumes the fixed-overlay technique.
+}
 ```
 
-But in most apps you won't need to &mdash; the muted DOM is a perfectly usable degraded state.
+The check is a thin wrapper around `CSS.supports("anchor-name: --x")`; safe to call at render time.
