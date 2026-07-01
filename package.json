@@ -1,7 +1,7 @@
 {
   "name": "bonework",
   "version": "0.1.3",
-  "description": "The laziest way to add skeleton loaders to React — wrap what you already render, and shimmers align themselves to the real DOM. No sizing props, no skeleton stand-ins, no drift.",
+  "description": "Minimal-effort skeleton loaders for React — wrap what you already render, and shimmers align themselves to the real DOM. No sizing props, no skeleton stand-ins, no drift.",
   "type": "module",
   "packageManager": "pnpm@11.9.0",
   "main": "./dist/bonework.cjs",

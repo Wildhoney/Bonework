@@ -9,7 +9,7 @@
 
 </div>
 
-> The laziest way to add skeleton loaders to React. Wrap what you already render &mdash; shimmers align themselves to the real DOM, automatically. No sizing props, no skeleton stand-ins, no drift as your UI evolves.
+> Minimal-effort skeleton loaders for React &mdash; wrap what you already render, and shimmers align themselves to the real DOM. No sizing props, no skeleton stand-ins, no drift as your UI evolves.
 
 > **[View Live Demo →](https://wildhoney.github.io/Bonework/)**
 
