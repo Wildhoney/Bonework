@@ -13,93 +13,80 @@
 
 > **[View Live Demo →](https://wildhoney.github.io/Bonework/)**
 
-## Install
+## Contents
+
+1. [Getting started](#getting-started)
+1. [Palette](#palette)
+1. [Placeholder](#placeholder)
+1. [Levels](#levels)
+1. [Recipes](#recipes)
+
+For advanced topics, see the [recipes directory](./recipes/).
+
+## Getting started
+
+Install, wrap what you already render, and flip `skeleton` while data is loading. `useBonework()` inside lets descendants render safe fallbacks that vanish when real data lands:
 
 ```sh
 pnpm add bonework
 ```
 
-## The core idea
-
-Wrap the real markup. Flip `skeleton` on while loading. That's it.
-
 ```tsx
-import { Bonework } from "bonework";
-
-<Bonework skeleton={!data} palette={{ bone: "#edeafd", highlight: "#ddd7fa" }}>
-  <h1>{data?.name ?? "Placeholder name"}</h1>
-  <p>{data?.bio ?? "Placeholder bio"}</p>
-</Bonework>;
-```
-
-- **`skeleton`** &mdash; `true` while you're waiting for data, `false` (or omit) once it's here.
-- **`palette`** &mdash; the only required styling. `{ bone, highlight }` &mdash; wire it to your design tokens.
-- **children** &mdash; your real UI. Bonework paints the shimmer directly over it using CSS Anchor Positioning.
-
-There is no separate skeleton tree to build or maintain. Refactor your layout freely; the skeleton follows.
-
-## `useBonework()` &mdash; safe placeholders
-
-Descendants of a `<Bonework>` can read its state with `useBonework()`. The hook exposes two things:
-
-```ts
-type BoneworkState = {
-  skeleton: boolean;
-  placeholder: <T, F>(
-    actual: T | null | undefined,
-    fallback: F,
-  ) => T | F | null;
-};
-```
-
-### The problem it solves
-
-A common mistake is to hard-code a fallback inline so the skeleton has _something_ to render:
-
-```tsx
-// Bad — "AED" leaks past the skeleton if the API returns currency: null
-<Currency currency={data.currency ?? "AED"} />
-```
-
-While the skeleton is up, showing `"AED"` is fine &mdash; the shimmer covers it anyway. But once the skeleton comes down, if the API genuinely returned `null`, `"AED"` is now a **lie**: it looks like real data but isn't.
-
-`placeholder(actual, fallback)` fixes that:
-
-```tsx
-import { useBonework } from "bonework";
+import { Bonework, useBonework } from "bonework";
 
 function Currency({ actual }: { actual: string | null }) {
   const { placeholder } = useBonework();
   return <span>{placeholder(actual, "AED")}</span>;
 }
+
+export function Wallet({ data }: { data: Wallet | null }) {
+  return (
+    <Bonework
+      skeleton={!data}
+      palette={{ bone: "#edeafd", highlight: "#ddd7fa" }}
+    >
+      <h1>{data?.name ?? "Placeholder name"}</h1>
+      <Currency actual={data?.currency ?? null} />
+    </Bonework>
+  );
+}
 ```
 
-The rules:
+Two moving parts. `<Bonework>` wraps the real UI and paints shimmers over it via CSS Anchor Positioning while `skeleton` is `true`. `useBonework()` reads that state so descendants render fallbacks (`placeholder(actual, fallback)`) that vanish once the skeleton drops.
 
-| `actual`     | `skeleton` | Returns    |
-| ------------ | ---------- | ---------- |
-| present      | either     | `actual`   |
-| `null` / `undefined` | `true` (skeleton up)   | `fallback` |
-| `null` / `undefined` | `false` (resolved)     | `null`     |
+## Palette
 
-So `"AED"` shows only while the skeleton is up. When the skeleton drops and the currency is genuinely missing, the component renders `null` &mdash; no fake data leaks.
-
-### Branching explicitly
-
-If you need the flag directly &mdash; for example to switch styles or avoid an expensive computation during the skeleton phase &mdash; read `skeleton`:
+`palette` is the only required styling &mdash; `{ bone, highlight }`, wired to your design tokens. `bone` is the still band; `highlight` is the sweep.
 
 ```tsx
-const { skeleton } = useBonework();
-if (skeleton) return <em>loading…</em>;
+<Bonework
+  skeleton
+  palette={{
+    bone: theme.colour.surface.muted,
+    highlight: theme.colour.surface.bold,
+  }}
+>
+  ...
+</Bonework>
 ```
 
-### Safe outside a `<Bonework>`
+No built-in palettes ship &mdash; bring your own.
 
-Used at the top level with no ancestor provider, the hook still works: `skeleton` is `false` and `placeholder(actual, fallback)` just returns `actual ?? null`. You never have to null-check.
+## Placeholder
 
-## Nested layouts with `levels`
+`useBonework()` returns `{ skeleton, placeholder }`. `placeholder(actual, fallback)` handles the common trap where a hard-coded default (`data.currency ?? "AED"`) leaks past resolution:
 
-By default a single shimmer paints over each direct child. For composed layouts &mdash; a flex row, a card with a header and body &mdash; you usually want each _leaf_ shimmering separately while the outer wrapper's gaps and grid tracks stay intact. Increase `levels`:
+| `actual`             | `skeleton`  | Returns    |
+| -------------------- | ----------- | ---------- |
+| present              | either      | `actual`   |
+| `null` / `undefined` | `true`      | `fallback` |
+| `null` / `undefined` | `false`     | `null`     |
+
+Outside a `<Bonework>` the hook is still safe: `placeholder` just returns `actual ?? null`.
+
+## Levels
+
+By default a single shimmer paints over each direct child. For composed layouts &mdash; a row, a card &mdash; you usually want each _leaf_ shimmering separately while wrapper gaps stay intact. Increase `levels`:
 
 ```tsx
 <Bonework skeleton palette={tokens} levels={2}>
@@ -113,14 +100,14 @@ By default a single shimmer paints over each direct child. For composed layouts 
 </Bonework>
 ```
 
-`levels={1}` anchors the row (one shimmer over the whole thing). `levels={2}` anchors `<img>` and the inner `<div>`. Bump it further to descend deeper. Outer wrappers keep their styling at every depth.
+`levels={1}` anchors the row. `levels={2}` anchors `<img>` and the inner `<div>`. Bump it further to descend deeper.
 
 ## Recipes
 
-- [Tuning the overlay (radius, duration)](./recipes/tuning-overlay.md)
-- [Testing components that use Bonework](./recipes/testing.md)
-- [Browser support and progressive enhancement](./recipes/browser-support.md)
-- [Full API reference](./recipes/api.md)
+- [Tuning](./recipes/tuning-overlay.md) &mdash; `radius`, `duration`, palette wiring.
+- [Testing](./recipes/testing.md) &mdash; asserting on anchored elements and testing the hook.
+- [Browsers](./recipes/browser-support.md) &mdash; support matrix and progressive-enhancement notes.
+- [API](./recipes/api.md) &mdash; full type reference.
 
 ## Licence
 
