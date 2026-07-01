@@ -3,14 +3,14 @@ import {
   Fragment,
   cloneElement,
   isValidElement,
-  useCallback,
+  useEffect,
   useState,
   type ReactElement,
   type ReactNode,
   type Ref,
 } from "react";
 
-import { cx, muted, overlay } from "./styles";
+import { anchorName, cx, muted, overlay } from "./styles";
 import type { Config, ElementProps, MaskProps } from "./types";
 
 export function supportsAnchorPositioning(): boolean {
@@ -39,22 +39,67 @@ export function applyMask(
 }
 
 function Mask({ child, anchor, config }: MaskProps): ReactElement {
+  const [node, setNode] = useState<HTMLElement | null>(null);
   const [radius, setRadius] = useState<string | null>(null);
+  const [lines, setLines] = useState<number>(1);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  const supported = supportsAnchorPositioning();
 
-  const measure = useCallback((node: HTMLElement | null) => {
+  useEffect(() => {
     if (!node) return;
     const computed = window.getComputedStyle(node).borderRadius;
     if (computed && computed !== "0px") setRadius(computed);
-  }, []);
+
+    const isTextLeaf =
+      node.childNodes.length > 0 &&
+      Array.from(node.childNodes).every(
+        (n) => n.nodeType === Node.TEXT_NODE,
+      );
+    if (!isTextLeaf) return;
+
+    const measureLines = (): void => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const tops: number[] = [];
+      for (const rect of range.getClientRects()) {
+        const tolerance = rect.height / 2;
+        if (!tops.some((t) => Math.abs(t - rect.top) < tolerance)) {
+          tops.push(rect.top);
+        }
+      }
+      setLines(Math.max(1, tops.length));
+    };
+    measureLines();
+
+    const observer = new ResizeObserver(measureLines);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [node]);
+
+  useEffect(() => {
+    if (supported || !node) return;
+    const measure = (): void => setRect(node.getBoundingClientRect());
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    window.addEventListener("scroll", measure, { passive: true, capture: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", measure, true);
+      window.removeEventListener("resize", measure);
+    };
+  }, [supported, node]);
+
+  const anchorClass = supported ? anchorName(anchor) : "";
 
   const anchored: ReactNode = isValidElement(child) ? (
-    cloneAnchor(child as ReactElement<ElementProps>, anchor, measure)
+    cloneAnchor(child as ReactElement<ElementProps>, anchorClass, setNode)
   ) : (
     <span
-      ref={measure}
+      ref={setNode}
       aria-hidden="true"
-      className={muted}
-      style={{ anchorName: anchor }}
+      className={cx(muted, anchorClass)}
     >
       {child}
     </span>
@@ -64,30 +109,37 @@ function Mask({ child, anchor, config }: MaskProps): ReactElement {
     config.palette,
     radius ?? config.radius,
     config.duration,
+    supported ? anchor : null,
+    lines,
   );
+
+  const overlayStyle =
+    !supported && rect
+      ? {
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        }
+      : undefined;
 
   return (
     <Fragment>
       {anchored}
-      <span
-        aria-hidden="true"
-        className={overlayClass}
-        style={{ positionAnchor: anchor }}
-      />
+      <span aria-hidden="true" className={overlayClass} style={overlayStyle} />
     </Fragment>
   );
 }
 
 function cloneAnchor(
   element: ReactElement<ElementProps>,
-  anchor: string,
+  anchorClass: string,
   ref: Ref<HTMLElement>,
 ): ReactElement {
   return cloneElement(element, {
     ref,
     "aria-hidden": true,
     tabIndex: -1,
-    className: cx(element.props.className, muted),
-    style: { ...element.props.style, anchorName: anchor },
+    className: cx(element.props.className, muted, anchorClass),
   } as Partial<ElementProps> & { ref: Ref<HTMLElement> });
 }

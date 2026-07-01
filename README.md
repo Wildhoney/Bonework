@@ -34,16 +34,22 @@ pnpm add bonework
 ```tsx
 import { Bonework, useBonework } from "bonework";
 
-function Currency({ actual }: { actual: string | null }) {
+const aed = new Intl.NumberFormat("en-AE", {
+  style: "currency",
+  currency: "AED",
+});
+
+function Balance({ amount }: { amount: number | null }) {
   const bonework = useBonework();
-  return <span>{bonework.placeholder(actual, "AED")}</span>;
+  const formatted = amount != null ? aed.format(amount) : null;
+  return <span>{bonework.placeholder(formatted, aed.format(0))}</span>;
 }
 
 export function Wallet({ data }: { data: Wallet | null }) {
   return (
     <Bonework skeleton={!data}>
       <h1>{data?.name ?? "Placeholder name"}</h1>
-      <Currency actual={data?.currency ?? null} />
+      <Balance amount={data?.balance ?? null} />
     </Bonework>
   );
 }
@@ -71,7 +77,7 @@ The default is exported as `defaultPalette` if you want to spread over it.
 
 ## Placeholder
 
-`useBonework()` returns `{ skeleton, placeholder }`. `placeholder(actual, fallback)` handles the common trap where a hard-coded default (`data.currency ?? "AED"`) leaks past resolution:
+`useBonework()` returns `{ skeleton, placeholder }`. `placeholder(actual, fallback)` handles the common trap where a hard-coded default (`data.balance ?? 0`) leaks past resolution:
 
 | `actual`             | `skeleton` | Returns    |
 | -------------------- | ---------- | ---------- |

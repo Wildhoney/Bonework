@@ -9,6 +9,7 @@ import { useState, type ReactElement } from "react";
 import { Bonework, useBonework } from "bonework";
 
 import { cattery, type Cat } from "./cattery";
+import mark from "./mark.png";
 import * as styles from "./styles";
 
 function CatBio({ actual }: { actual: string | null }): ReactElement | null {
@@ -75,16 +76,15 @@ function Cattery(): ReactElement {
     <main className={styles.page}>
       <header className={styles.header}>
         <div className={styles.brand}>
-          <span className={styles.brandMark}>B</span>
+          <img src={mark} alt="" className={styles.brandMark} />
           <strong>Bonework Cattery</strong>
         </div>
         <button
           type="button"
           className={styles.button}
           onClick={() => adoption.mutate()}
-          disabled={adoption.isPending}
         >
-          {adoption.isPending ? "Adoption in progress…" : "Adopt a new cat"}
+          Adopt a new cat
         </button>
       </header>
 

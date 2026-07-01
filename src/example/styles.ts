@@ -40,18 +40,18 @@ export const brand = css`
   display: flex;
   align-items: center;
   gap: ${tokens.spacing.s};
-  font-size: 20px;
+  font-family: "Creepster", system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
 `;
 
 export const brandMark = css`
-  width: 32px;
-  height: 32px;
-  border-radius: ${tokens.radius.s};
-  background: ${tokens.colour.accent};
-  color: white;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
+  width: 96px;
+  height: 64px;
+  display: block;
+  object-fit: contain;
+  image-rendering: pixelated;
 `;
 
 export const button = css`

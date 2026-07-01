@@ -69,7 +69,6 @@ export default defineConfig(({ mode }) => {
               "react/jsx-runtime",
               "@emotion/css",
               "@emotion/css/create-instance",
-              "@oddbird/css-anchor-positioning/fn",
             ],
             output: { globals: { react: "React" } },
           },
