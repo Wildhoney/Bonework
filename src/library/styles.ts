@@ -15,8 +15,8 @@ export const muted = css`
 
 export function overlay(
   palette: Palette,
-  borderRadius: number | string,
-  durationMs: number,
+  radius: number | string,
+  duration: number,
 ): string {
   return css`
     position: fixed;
@@ -24,9 +24,7 @@ export function overlay(
     inset-inline-start: anchor(left);
     inset-inline-end: anchor(right);
     inset-block-end: anchor(bottom);
-    border-radius: ${
-      typeof borderRadius === "number" ? `${borderRadius}px` : borderRadius
-    };
+    border-radius: ${typeof radius === "number" ? `${radius}px` : radius};
     background-image: linear-gradient(
       90deg,
       ${palette.bone} 0%,
@@ -34,7 +32,7 @@ export function overlay(
       ${palette.bone} 100%
     );
     background-size: 200% 100%;
-    animation: ${shimmer} ${durationMs}ms ease-in-out infinite;
+    animation: ${shimmer} ${duration}ms ease-in-out infinite;
     pointer-events: none;
     z-index: 1;
   `;

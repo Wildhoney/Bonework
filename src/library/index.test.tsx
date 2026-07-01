@@ -1,7 +1,7 @@
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, render, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Bonework } from "./index";
+import { Bonework, useBonework } from "./index";
 
 const palette = { bone: "#eee", highlight: "#fff" } as const;
 
@@ -11,9 +11,9 @@ afterEach(() => {
 });
 
 describe("<Bonework />", () => {
-  it("renders children unmodified when resolving", () => {
+  it("renders children unmodified when skeleton is false", () => {
     const { container } = render(
-      <Bonework resolving palette={palette}>
+      <Bonework palette={palette}>
         <p>Hello</p>
       </Bonework>,
     );
@@ -24,7 +24,7 @@ describe("<Bonework />", () => {
 
   it("anchors each top-level child and pairs it with an overlay", () => {
     const { container } = render(
-      <Bonework palette={palette}>
+      <Bonework skeleton palette={palette}>
         <p>Hello</p>
         <p>World</p>
       </Bonework>,
@@ -40,7 +40,7 @@ describe("<Bonework />", () => {
 
   it("descends to the requested levels", () => {
     const { container } = render(
-      <Bonework palette={palette} levels={2}>
+      <Bonework skeleton palette={palette} levels={2}>
         <div>
           <span>A</span>
           <span>B</span>
@@ -57,7 +57,9 @@ describe("<Bonework />", () => {
 
   it("wraps non-element children in an anchored span", () => {
     const { container } = render(
-      <Bonework palette={palette}>plain text</Bonework>,
+      <Bonework skeleton palette={palette}>
+        plain text
+      </Bonework>,
     );
     const wrapper = container.querySelector("span[aria-hidden='true']");
     expect(wrapper).not.toBeNull();
@@ -66,7 +68,7 @@ describe("<Bonework />", () => {
 
   it("clamps levels below 1 to 1", () => {
     const { container } = render(
-      <Bonework palette={palette} levels={0}>
+      <Bonework skeleton palette={palette} levels={0}>
         <p>Hello</p>
       </Bonework>,
     );
@@ -74,9 +76,9 @@ describe("<Bonework />", () => {
     expect((p as HTMLElement).style.anchorName).toMatch(/^--sk-/);
   });
 
-  it("passes a string borderRadius through verbatim", () => {
+  it("passes a string radius through verbatim", () => {
     const { container } = render(
-      <Bonework palette={palette} borderRadius="1rem">
+      <Bonework skeleton palette={palette} radius="1rem">
         <p>Hello</p>
       </Bonework>,
     );
@@ -88,10 +90,55 @@ describe("<Bonework />", () => {
       borderRadius: "12px",
     } as CSSStyleDeclaration);
     const { container } = render(
-      <Bonework palette={palette}>
+      <Bonework skeleton palette={palette}>
         <p>Hello</p>
       </Bonework>,
     );
     expect(container.querySelector("p")).not.toBeNull();
+  });
+});
+
+describe("useBonework()", () => {
+  it("returns a safe default outside of any <Bonework>", () => {
+    const { result } = renderHook(() => useBonework());
+    expect(result.current.skeleton).toBe(false);
+    expect(result.current.placeholder(null, "AED")).toBeNull();
+    expect(result.current.placeholder("USD", "AED")).toBe("USD");
+  });
+
+  it("returns the fallback when actual is missing and the skeleton is up", () => {
+    const { result } = renderHook(() => useBonework(), {
+      wrapper: ({ children }) => (
+        <Bonework skeleton palette={palette}>
+          {children}
+        </Bonework>
+      ),
+    });
+    expect(result.current.skeleton).toBe(true);
+    expect(result.current.placeholder(null, "AED")).toBe("AED");
+    expect(result.current.placeholder(undefined, "AED")).toBe("AED");
+  });
+
+  it("always prefers actual data even while the skeleton is up", () => {
+    const { result } = renderHook(() => useBonework(), {
+      wrapper: ({ children }) => (
+        <Bonework skeleton palette={palette}>
+          {children}
+        </Bonework>
+      ),
+    });
+    expect(result.current.placeholder("USD", "AED")).toBe("USD");
+    expect(result.current.placeholder(0, "AED")).toBe(0);
+  });
+
+  it("suppresses the fallback once the skeleton is down", () => {
+    const { result } = renderHook(() => useBonework(), {
+      wrapper: ({ children }) => (
+        <Bonework palette={palette}>{children}</Bonework>
+      ),
+    });
+    expect(result.current.skeleton).toBe(false);
+    expect(result.current.placeholder(null, "AED")).toBeNull();
+    expect(result.current.placeholder("USD", "AED")).toBe("USD");
   });
 });

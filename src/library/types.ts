@@ -21,9 +21,17 @@ export type ElementProps = {
 
 export type Props = {
   children?: ReactNode;
-  resolving?: boolean;
+  skeleton?: boolean;
   levels?: number;
   palette: Palette;
-  borderRadius?: number | string;
-  durationMs?: number;
+  radius?: number | string;
+  duration?: number;
+};
+
+export type BoneworkState = {
+  skeleton: boolean;
+  placeholder: <T, F>(
+    actual: T | null | undefined,
+    fallback: F,
+  ) => T | F | null;
 };

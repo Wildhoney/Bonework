@@ -83,13 +83,13 @@ function Cattery(): ReactElement {
 
       <div className={styles.grid}>
         {cats.map((cat) => {
-          const resolving =
-            !cat.id.startsWith("__loading_") &&
-            !(isLoadingInitial && cat.id.startsWith("__loading_initial_"));
+          const skeleton =
+            cat.id.startsWith("__loading_") ||
+            (isLoadingInitial && cat.id.startsWith("__loading_initial_"));
           return (
             <Bonework
               key={cat.id}
-              resolving={resolving}
+              skeleton={skeleton}
               palette={styles.palette}
               levels={3}
             >

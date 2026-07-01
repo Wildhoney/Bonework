@@ -1,2 +1,6 @@
-export { Bonework } from "./library";
-export type { Palette, Props as BoneworkProps } from "./library/types";
+export { Bonework, useBonework } from "./library";
+export type {
+  BoneworkState,
+  Palette,
+  Props as BoneworkProps,
+} from "./library/types";

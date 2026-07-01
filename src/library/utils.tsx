@@ -16,8 +16,8 @@ import type { ElementProps, Palette } from "./types";
 
 type Options = {
   palette: Palette;
-  borderRadius: number | string;
-  durationMs: number;
+  radius: number | string;
+  duration: number;
 };
 
 export function applyMask(
@@ -71,8 +71,8 @@ function Mask({ child, anchor, options }: MaskProps): ReactElement {
 
   const overlayClass = overlay(
     options.palette,
-    radius ?? options.borderRadius,
-    options.durationMs,
+    radius ?? options.radius,
+    options.duration,
   );
 
   return (
